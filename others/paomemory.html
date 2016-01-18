@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head><title>PAO System Memoriser</title>
+<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css" media="screen">
+<script>
+
+var pArray = new Array(10);
+	pArray[0] = "obama.jpg";
+	pArray[1] = "inuit.jpg";
+	pArray[2] = "victory.jpg";
+	pArray[3] = "tree.jpg";
+	pArray[4] = "maozedong.jpg";
+	pArray[5] = "vespiqueen.png";
+	pArray[6] = "sex.jpg";
+	pArray[7] = "gambler.png";
+	pArray[8] = "fatman.jpg";
+	pArray[9] = "cat.jpg";
+var aArray = new Array(10);
+	aArray[0] = "cannon.jpg";
+	aArray[1] = "flagpoling.jpg";
+	aArray[2] = "stilts.jpg";
+	aArray[3] = "photocopy.jpg";
+	aArray[4] = "mahjong.jpg";
+	aArray[5] = "fan.jpg";
+	aArray[6] = "frying.jpg";
+	aArray[7] = "selfie.jpg";
+	aArray[8] = "waveboard.jpg";
+	aArray[9] = "golf.jpg";
+var oArray = new Array(10);
+	oArray[0] = "heaven.jpg";
+	oArray[1] = "eiffel.jpg";
+	oArray[2] = "wtc.jpg";
+	oArray[3] = "macdonald.jpg";
+	oArray[4] = "pyramids.jpg";
+	oArray[5] = "fivefinger.jpg";
+	oArray[6] = "niagara.jpg";
+	oArray[7] = "casino.jpg";
+	oArray[8] = "ship.jpg";
+	oArray[9] = "moon.jpg";
+
+var number = [0,0,0];
+	
+
+window.onload=function() {
+	randomiseImages();
+}
+
+function submit(event) {
+
+	if(event.keyCode == 13) {
+		try {
+			var input = parseInt(document.getElementById("input").value);
+			var first = Math.floor(input/100);
+			var second = Math.floor((input-first*100)/10);
+			var third = (input-first*100)-second*10;
+			console.log(first);
+			console.log(second);
+			console.log(third);
+			console.log(number[0]);
+			console.log(number[1]);
+			console.log(number[2]);
+			if (number[2] == first && number[1] == second && number[0] == third) {
+				document.getElementById("input").value = "";
+				randomiseImages();
+			} else {
+				window.alert("Fail!");
+				document.getElementById("input").value = "";
+			}
+		} catch(error) {
+			window.alert(error);
+		}
+		
+	}
+	
+}
+
+function randomiseImages() {
+	var length = pArray.length;
+	number[0] = Math.floor(Math.random()*length);
+	number[1] = Math.floor(Math.random()*length);
+	number[2] = Math.floor(Math.random()*length);
+	document.getElementById("one").src="../res/o/"+oArray[number[0]];	
+	document.getElementById("two").src="../res/a/"+aArray[number[1]];
+	document.getElementById("three").src="../res/p/"+pArray[number[2]];
+}
+
+
+</script>
+<style>
+
+	.first{
+		width: 33%;
+		height: 400px;
+		float: right;
+		position: relative;
+	}
+	.second{
+		width: 33%;
+		height: 400px;
+		float: right;
+		position: relative;
+	}
+	.third{
+		width: 33%;
+		height: 400px;
+		float: right;
+		position: relative;
+	}
+</style>
+
+</head>
+
+<body>
+
+	<div class="container">
+		<h1>PAO Memory System</h1>
+	</div>
+	<br>
+
+	<div class="container">
+		<div class="col-md-12">
+			
+				<img src="../res/maozedong.jpg" id="one" class="imagecontainer img-thumbnail first">
+				<img src="../res/maozedong.jpg" id="two" class="imagecontainer img-thumbnail second">
+				<img src="../res/maozedong.jpg" id="three" class="imagecontainer img-thumbnail third">
+			
+		</div>		
+	</div>
+	<br>
+	<div class="container">
+		<div class="col-md-4 col-md-offset-4">
+			
+				<input class="form-control" id="input" type="text" placeholder="Number" onkeypress="submit(event)">
+				
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>

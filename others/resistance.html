@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Resistance!</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" >
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css" media="screen">
+<script language="Javascript">
+var gamestate = 0;
+var playernumber = 0;
+var round = 0;
+var passvotes = 0;
+var failvotes = 0;
+var rwins = 0;
+var swins = 0;
+var spyNumber = [2,2,3,3,3,4];
+var teamsize = [
+[2,3,2,3,3],
+[2,3,4,3,4],
+[2,3,3,4,4],
+[3,4,4,5,5],
+[3,4,4,5,5],
+[3,4,4,5,5]
+];
+var identity = new Array();
+var current = 0;
+
+window.onload=function() {
+  document.getElementById("gameview").style.display="none";
+  document.getElementById("voteview").style.display="none";
+}
+
+function startGame() {
+  
+  if (gamestate===0) {
+    
+    if (playernumber < 5) {
+      document.getElementById("gamestatetext").innerHTML = "Please select a player number before starting the game.";
+    } else {
+      document.getElementById("gamestatetext").innerHTML = "The game of Resistance has begun.";
+      document.getElementById("btnStart").innerHTML = "Stop Game";
+      document.getElementById("gameview").style.display="block";
+      gamestate = 1;
+      identity = new Array();
+      current = 0;
+      setIdentities();
+      
+    }
+
+    //while (swins < 3 && rwins < 3) {
+      //break;
+    //}
+
+
+  } else {//reset
+    gamestate = 0;
+    playernumber = 0;
+    round = 0;
+    passvotes = 0;
+    failvotes = 0;
+    rwins = 0;
+    swins = 0;
+    current = 0;
+    document.getElementById("btnNext").innerHTML = "Reveal";
+    document.getElementById("gameview").style.display="none";
+    document.getElementById("voteview").style.display="none";
+    document.getElementById("gamestatetext").innerHTML = "The game has not started. Select player number and start the game.";
+    document.getElementById("playertext").innerHTML = "There are currently "+playernumber+" players.";
+    document.getElementById("btnStart").innerHTML = "Start Game";
+    document.getElementById("titletwo").innerHTML = "Player Identities!";
+    document.getElementById("instructionstext").innerHTML = "We will now begin revealing your identity. Pass to next player. Press next to view the identity.";
+  }
+
+}
+
+function setIdentities() {
+  if (playernumber >= 5 && playernumber <= 10) {
+    //identity = new boolean[playernumber];
+    var spies = spyNumber[playernumber-5];
+    for (var i = 0; i < playernumber; i++) {
+      identity[i] = false;
+    }
+    //window.alert("The number of spies is "+spies+" in a game of "+playernumber+" players.");
+    while(spies > 0) {
+      var number = Math.floor(Math.random()*(playernumber));
+      if (identity[number] == false) {
+        identity[number] = true;
+        spies--;
+      }
+    }
+  }
+}
+
+function revealNext() {
+  var button = document.getElementById("btnNext");
+  if (button.innerHTML == "Let's play!") {
+    document.getElementById("voteview").style.display="block";
+    document.getElementById("gameview").style.display="none";
+    nextRound();
+  }
+
+  else if (current < playernumber) {//not revealed all players
+    
+    if (button.innerHTML == "Reveal") {
+      if (identity[current] == true) {
+        document.getElementById("instructionstext").innerHTML = "You are an imperial spy!";
+      } else {
+        document.getElementById("instructionstext").innerHTML = "You are in the resistance!";
+      }
+      button.innerHTML = "Okay!";
+
+    } else {
+      document.getElementById("instructionstext").innerHTML = "We will now begin revealing your identity. Pass to next player. Press reveal to view the identity.";
+      current++;
+      button.innerHTML = "Reveal";
+      if (current >= playernumber) {
+        current = -1;
+        document.getElementById("instructionstext").innerHTML = "We are done!";
+        button.innerHTML = "Let's play!";
+      }
+    }
+  } else {//finished revealing
+    document.getElementById("instructionstext").innerHTML = "We are done!";
+      
+  }
+
+}
+
+function nextRound() {
+  if (rwins >= 3) {
+    document.getElementById("titlethree").innerHTML = "The resistance wins!";
+    document.getElementById("instructionstexttwo").innerHTML = "The brave resistance fighters crush the imperial spies with an overwhelming victory of "+rwins+":"+swins+"!";
+    document.getElementById("scoretext").innerHTML = "Hope you enjoyed the game!";
+    document.getElementById("votetext").innerHTML = "";
+    document.getElementById("btnProceed").style.display="none";
+  } else if (swins >= 3) {
+    document.getElementById("titlethree").innerHTML = "The imperial spies win!";
+    document.getElementById("instructionstexttwo").innerHTML = "The cunning imperial spies outsmart the resistance to an overwhelming victory of "+swins+":"+rwins+"!";
+    document.getElementById("scoretext").innerHTML = "Hope you enjoyed the game!";
+    document.getElementById("votetext").innerHTML = "";
+    document.getElementById("btnProceed").style.display="none";
+  } else {
+    round++;
+    passvotes = 0;
+    failvotes = 0;
+    document.getElementById("btnPass").style.display="inline";
+    document.getElementById("btnFail").style.display="inline";
+    document.getElementById("btnEva").style.display="inline";
+    document.getElementById("btnProceed").style.display="none";
+    //set text
+    document.getElementById("titlethree").innerHTML = "Round "+round;
+    if (round == 4 && playernumber >= 7) {//two fails
+      document.getElementById("instructionstexttwo").innerHTML = "We will now commence voting. Two fail votes are required to fail the mission. You need to form a team of "+teamsize[playernumber-5][round-1]+" for this mission. Choose wisely."
+    } else {
+      document.getElementById("instructionstexttwo").innerHTML = "We will now commence voting. One fail vote is required to fail the mission. You need to form a team of "+teamsize[playernumber-5][round-1]+" for this mission. Choose wisely."
+    }
+    document.getElementById("scoretext").innerHTML = "The current number of successful missions is "+rwins+". The current number of failed missions is "+swins+".";
+    document.getElementById("votetext").innerHTML = (passvotes+failvotes)+" votes have been cast."
+  }
+}
+
+function votePass() {
+  if (passvotes+failvotes < teamsize[playernumber-5][round-1])
+  passvotes++;
+  else window.alert("Everyone has already voted!");
+  document.getElementById("votetext").innerHTML = (passvotes+failvotes)+" votes have been cast.";
+}
+function voteFail() {
+  if (passvotes+failvotes < teamsize[playernumber-5][round-1])
+  failvotes++;
+  else window.alert("Everyone has already voted!");
+  document.getElementById("votetext").innerHTML = (passvotes+failvotes)+" votes have been cast.";
+}
+
+function voteEva() {
+  if (passvotes+failvotes < teamsize[playernumber-5][round-1]) {
+    window.alert("Not everyone has voted!");
+  } else {
+    failure = 1;
+    if (round == 4 && playernumber >= 7) failure = 2;
+    if (failvotes >= failure) {
+      swins++;
+      document.getElementById("titlethree").innerHTML = "Round "+round+" failed!";
+    } else {
+      rwins++;
+      document.getElementById("titlethree").innerHTML = "Round "+round+" passes!";
+    }
+    document.getElementById("instructionstexttwo").innerHTML = "Number of passes: "+passvotes;
+    document.getElementById("scoretext").innerHTML = "Number of fails: "+failvotes;
+    document.getElementById("votetext").innerHTML = "Press next to proceed to the next round";
+    document.getElementById("btnPass").style.display="none";
+    document.getElementById("btnFail").style.display="none";
+    document.getElementById("btnEva").style.display="none";
+    document.getElementById("btnProceed").style.display="inline";
+
+  }
+}
+
+//setting player number
+function setfive() {
+  if (gamestate==0)
+  playernumber = 5;
+  document.getElementById("playertext").innerHTML = "There are currently "+playernumber+"  players.";
+}
+function setsix() {
+  if (gamestate==0)
+  playernumber = 6;
+  document.getElementById("playertext").innerHTML = "There are currently "+playernumber+"  players.";
+}
+function setseven() {
+  if (gamestate==0)
+  playernumber = 7;
+  document.getElementById("playertext").innerHTML = "There are currently "+playernumber+"  players.";
+}
+function seteight() {
+  if (gamestate==0)
+  playernumber = 8;
+  document.getElementById("playertext").innerHTML = "There are currently "+playernumber+"  players.";
+}
+function setnine() {
+  if (gamestate==0)
+  playernumber = 9;
+  document.getElementById("playertext").innerHTML = "There are currently "+playernumber+"  players.";
+}
+function setten() {
+  if (gamestate==0)
+  playernumber = 10;
+  document.getElementById("playertext").innerHTML = "There are currently "+playernumber+"  players.";
+}
+
+</script>
+
+
+</head>
+
+<body>
+
+
+<div class="container">
+
+
+  <div class="jumbotron">
+    <h1 id="title">The Game of Resistance</h1>
+    <p id="gamestatetext">The game has not started. Select player number and start the game.</p>
+    <p id="playertext">There are currently 0 players.</p>
+    <p><a class="btn btn-primary btn-lg" onclick="startGame()" id="btnStart">Start Game</a></p>
+    <p><div class="btn-group">
+        <button type="button" class="btn btn-default" onclick="setfive()">5</button>
+        <button type="button" class="btn btn-default" onclick="setsix()">6</button>
+        <button type="button" class="btn btn-default" onclick="setseven()">7</button>
+        <button type="button" class="btn btn-default" onclick="seteight()">8</button>
+        <button type="button" class="btn btn-default" onclick="setnine()">9</button>
+        <button type="button" class="btn btn-default" onclick="setten()">10</button>
+    </div></p>
+  </div>
+
+  <div class="jumbotron" id="gameview">
+    <h1 id="titletwo">Player Identities!</h1>
+    <p id="instructionstext">We will now begin revealing your identity. Pass to next player. Press reveal to view the identity.</p>
+    <p><a class="btn btn-primary btn-lg" onclick="revealNext()" id="btnNext">Reveal</a></p>
+  </div>
+
+  <div class="jumbotron" id="voteview">
+    <h1 id="titlethree">Round 1</h1>
+    <p id="instructionstexttwo">We will now commence voting. One fail vote is required to fail the mission. You need to form a team of x for this first mission. Choose wisely.</p>
+    <p id="scoretext">The number of successful missions is 0. The number of failed missions is 0.</p>
+    <p id="votetext">0 votes have been cast.</p>
+    <p><a class="btn btn-success btn-lg" onclick="votePass()" id="btnPass">Pass</a>
+    <a class="btn btn-danger btn-lg" onclick="voteFail()" id="btnFail">Fail</a>
+    <a class="btn btn-primary btn-lg" onclick="voteEva()" id="btnEva">Evaluate</a>
+    <a class="btn btn-primary btn-lg" onclick="nextRound()" id="btnProceed">Next</a></p>
+  </div>
+
+
+
+
+
+</div>
+
+
+
+
+  
+
+
+
+</body>
+</html>
